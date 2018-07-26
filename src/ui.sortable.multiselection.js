@@ -6,7 +6,7 @@ angular.module('ui.sortable.multiselection', [])
       return {
         link: function(scope, element/*, attrs*/) {
           element.on('click', function (e) {
-            scope.$watch(function () {
+            scope.$apply(function () {
               var $this = angular.element(this);
 
               var $parent = $this.parent();
