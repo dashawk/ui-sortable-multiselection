@@ -6,61 +6,63 @@ angular.module('ui.sortable.multiselection', [])
       return {
         link: function(scope, element/*, attrs*/) {
           element.on('click', function (e) {
-            var $this = angular.element(this);
+            scope.$watch(function () {
+              var $this = angular.element(this);
 
-            var $parent = $this.parent();
-
-            var multiSelectOnClick = $parent.sortable('option', 'multiSelectOnClick') || false;
-
-            var isDisabled = $parent.sortable('option', 'disabled');
-
-            if (isDisabled){
-              return;
-            }
-            var jquerySortableCancelOption = $parent.sortable('option', 'cancel');
-            var jquerySortableHandleOption = $parent.sortable('option', 'handle');
-
-            // Respect jQuery UI Sortable's cancel property by testing if element matches selector
-            if (jquerySortableCancelOption !== undefined && $this.is(jquerySortableCancelOption)) {
-              return;
-            }
-
-            // Mimic jQuery UI Sortable's handle property when determining if an item is selected
-            if (jquerySortableHandleOption) {
-              var validHandle = false;
-
-              $parent.find(jquerySortableHandleOption).find('*').addBack().each(function () {
-                if (this === e.target) {
-                  validHandle = true;
-                }
-              });
-
-              if (!validHandle) {
+              var $parent = $this.parent();
+  
+              var multiSelectOnClick = $parent.sortable('option', 'multiSelectOnClick') || false;
+  
+              var isDisabled = $parent.sortable('option', 'disabled');
+  
+              if (isDisabled){
                 return;
               }
-            }
-
-            var sortableMultiSelectState = $parent.data('uiSortableMultiSelectionState') || {};
-
-            var lastIndex = sortableMultiSelectState.lastIndex;
-            var index = $this.index();
-
-            if (e.ctrlKey || e.metaKey || multiSelectOnClick) {
-              $this.toggleClass(selectedItemClass);
-            } else if (e.shiftKey && lastIndex !== undefined && lastIndex >= 0) {
-              if (index > lastIndex) {
-                $parent.children().slice(lastIndex, index + 1).addClass(selectedItemClass);
-              } else if(index < lastIndex) {
-                $parent.children().slice(index, lastIndex).addClass(selectedItemClass);
+              var jquerySortableCancelOption = $parent.sortable('option', 'cancel');
+              var jquerySortableHandleOption = $parent.sortable('option', 'handle');
+  
+              // Respect jQuery UI Sortable's cancel property by testing if element matches selector
+              if (jquerySortableCancelOption !== undefined && $this.is(jquerySortableCancelOption)) {
+                return;
               }
-            } else {
-              $parent.children('.'+selectedItemClass).not($this).removeClass(selectedItemClass);
-              $this.toggleClass(selectedItemClass);
-            }
-            sortableMultiSelectState.lastIndex = index;
-            $parent.data('uiSortableMultiSelectionState', sortableMultiSelectState);
-
-            $parent.trigger('ui-sortable-selectionschanged');
+  
+              // Mimic jQuery UI Sortable's handle property when determining if an item is selected
+              if (jquerySortableHandleOption) {
+                var validHandle = false;
+  
+                $parent.find(jquerySortableHandleOption).find('*').addBack().each(function () {
+                  if (this === e.target) {
+                    validHandle = true;
+                  }
+                });
+  
+                if (!validHandle) {
+                  return;
+                }
+              }
+  
+              var sortableMultiSelectState = $parent.data('uiSortableMultiSelectionState') || {};
+  
+              var lastIndex = sortableMultiSelectState.lastIndex;
+              var index = $this.index();
+  
+              if (e.ctrlKey || e.metaKey || multiSelectOnClick) {
+                $this.toggleClass(selectedItemClass);
+              } else if (e.shiftKey && lastIndex !== undefined && lastIndex >= 0) {
+                if (index > lastIndex) {
+                  $parent.children().slice(lastIndex, index + 1).addClass(selectedItemClass);
+                } else if(index < lastIndex) {
+                  $parent.children().slice(index, lastIndex).addClass(selectedItemClass);
+                }
+              } else {
+                $parent.children('.'+selectedItemClass).not($this).removeClass(selectedItemClass);
+                $this.toggleClass(selectedItemClass);
+              }
+              sortableMultiSelectState.lastIndex = index;
+              $parent.data('uiSortableMultiSelectionState', sortableMultiSelectState);
+  
+              $parent.trigger('ui-sortable-selectionschanged');
+            });
           });
 
           element.parent().on('$destroy', function() {
